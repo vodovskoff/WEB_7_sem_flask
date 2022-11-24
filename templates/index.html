@@ -4,34 +4,88 @@
  <title> Приветствие </title>
  </head>
 <body>
- <form action="{{ url_for('hello') }}" method="get">
- <p>Имя: <input type = text name=username></p>
+ <form action="{{ url_for('index') }}" method="get">
+ <p>Имя: <input type = text name=username {% if submit and name %} value="{{ name }}" {% endif %}></p>
  <p>Пол:<br>
- <input type = radio name=gender value=w> Ж <br>
- <input type = radio name=gender value=m> M
+ <input type = radio name=gender value=w {% if submit and gender and gender=='w' %} checked="true" {% endif %}> Ж <br>
+ <input type = radio name=gender value=m {% if submit and gender and gender=='m' %} checked="true" {% endif %}> M
  </p>
 </p>
  Образовательная программа:
  <select name=program>
  {% for i in range(len(program_list)) %}
- <option value={{i}}>{{program_list[i]}}</option>
+ <option {% if submit and program_id and i==program_id %}selected="selected"{% endif %} value={{i}}>{{program_list[i]}}</option>
  {% endfor %}
  </select>
  </p>
  <p>
  Выберите дисциплины, которые Вы изучаете:<br>
  {% for i in range(len(subject_list)) %}
- <input type = checkbox name=subject[] value={{i}}>
+ <input {% if submit and i in subject_id %} checked="checked" {% endif %} type = checkbox name=subject[] value={{i}}>
  {{subject_list[i]}}<br>
  {% endfor %}
  </p>
  <p>
  Выберите олимпиады, в которых участвовали:<br>
  {% for i in range(len(olympiads_list)) %}
- <input type = checkbox name=olympiads[] value={{i}}>
+ <input {% if i in olympiad_id %} checked="checked" {% endif %} type = checkbox name=olympiads[] value={{i}}>
  {{olympiads_list[i]}}<br>
  {% endfor %}
  </p>
- <p><input type=submit value=Отправить></p> </form>
+ <p><input type=submit name="submit" value=Отправить></p> </form>
+
+{% if submit %}
+    {% if name %}
+         Привет,
+         {% if gender == "m" %}
+         студент
+         {% elif gender == "w" %}
+         студентка
+         {% endif %}
+         {{name}}!
+         {% else %}
+         {{ 'Введите имя!' }}
+    {% endif %}
+
+    <p>
+    Ваша образовательная программа: {{program}}.
+    </p>
+    <p>
+{% if len(subjects_select)==0 %}
+{{' Вы не выбрали дисциплины! '}}
+{% else %}
+ Вы изучаете дисциплины:
+ {% for sub in subjects_select %}
+ {% if sub == subjects_select[-1] %}
+ <a href={{ url_for('subject', sub=sub) }}> {{sub}}</a>.
+ {% else %}
+ <a href={{ url_for('subject', sub=sub) }}> {{sub}}</a>,
+ {% endif %}
+ {% endfor %}
+{% endif %}
+</p>
+
+
+<p>
+{% if len(olympiads_select)==0 %}
+{{' Вы нигде не участвовали! '}}
+{% else %}
+ Вы участвовали в соревнованиях:
+ {% for sub in olympiads_select %}
+ {% if sub == olympiads_select[-1] %}
+    <a href={{ url_for('olympiad', sub=sub) }}> {{sub}}</a>.
+ {% else %}
+    <a href={{ url_for('olympiad', sub=sub) }}> {{sub}}</a>,
+    {% endif %}
+ {% endfor %}
+{% endif %}
+</p>
+{% endif %}
+ {% if submit %}
+ <form action="{{ url_for('index') }}" method="get">
+      <p><input type=submit name="submit1" value=Очистить></p> </form>
+
+ </form>
+{% endif %}
 </body>
 </html>
